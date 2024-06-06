@@ -1,0 +1,18 @@
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: observability
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: uptrace
+  namespace: observability
+spec:
+  repo: https://charts.uptrace.dev
+  chart: uptrace
+  version: 1.5.7
+  targetNamespace: observability
+  valuesContent:
+    name: uptrace-values
+    key: config.yaml
