@@ -1,0 +1,17 @@
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: monitoring
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: jaeger
+  namespace: monitoring
+spec:
+  repo: https://jaegertracing.github.io/helm-charts
+  chart: jaeger
+  version: 3.0.10
+  targetNamespace: monitoring
+  valuesContent: |-
+    {{- include "jaeger-values" . | nindent 2 }}

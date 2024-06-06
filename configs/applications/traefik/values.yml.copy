@@ -55,8 +55,8 @@ data:
         insecure: true
         grpc: true
         headers:
-          uptrace-dsn: http://<SECRET>@uptrace.observability.svc.cluster.local:14317/2
-        address: uptrace.observability.svc.cluster.local:14317
+          uptrace-dsn: http://<SECRET>@uptrace.monitoring.svc.cluster.local:14317/2
+        address: uptrace.monitoring.svc.cluster.local:14317
 
     ports:
       metrics:
