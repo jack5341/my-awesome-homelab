@@ -5,4 +5,72 @@ metadata:
   namespace: kube-system
 spec:
   valuesContent: |-
-    {{- include "jaeger-values" . | nindent 2 }}
+    podAnnotations:
+      prometheus.io/port: "8082"
+      prometheus.io/scrape: "true"
+
+    providers:
+      kubernetesIngress:
+        publishedService:
+          enabled: true
+
+    image:
+      repository: traefik
+      tag: v3.0.0-beta5
+
+    additionalArguments:
+      - --certificatesresolvers.cloudflare.acme.dnschallenge.provider=cloudflare
+      - --certificatesresolvers.cloudflare.acme.email=nedim.akar53411@gmail.com
+      - --certificatesresolvers.cloudflare.acme.dnschallenge.resolvers=1.1.1.1
+      - --certificatesresolvers.cloudflare.acme.storage=/ssl-certs/acme-cloudflare.json
+
+    ingressRoute:
+      healthcheck:
+        enabled: true
+        matchRule: PathPrefix(`/ping`)
+      dashboard:
+        enabled: true
+        matchRule: Host(`dashboard.nedim-akar.cloud`)
+        entryPoints: ["web", "websecure"]
+
+    persistence:
+      enabled: true
+      accessMode: ReadWriteOnce
+      size: 1Gi
+      path: /ssl-certs
+      annotations: {}
+
+    # tracing:
+    #   openTelemetry:
+    #     insecure: true
+    #     grpc: true
+    #     headers:
+    #       uptrace-dsn: http://OcKManGSHICo@uptrace.observability.svc.cluster.local:14317/2
+    #     address: uptrace.observability.svc.cluster.local:14317
+
+    ports:
+      metrics:
+        expose: true
+      traefik:
+        expose: true
+      websecure:
+        tls:
+          enabled: true
+          certResolver: cloudflare
+          domains:
+            - main: "nedim-akar.cloud"
+              sans:
+                - "*.nedim-akar.cloud"
+        
+    env:
+      - name: CF_API_EMAIL
+        valueFrom:
+          secretKeyRef:
+            name: cloudflare-credentials 
+            key: email
+
+      - name: CF_API_KEY
+        valueFrom:
+          secretKeyRef:
+            name: cloudflare-credentials  
+            key: apiKey
